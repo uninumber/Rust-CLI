@@ -64,7 +64,7 @@ pub fn run(config: Config) -> MyResult<()> {
             Ok(mut file) => {
                 if num_of_files > 1 {
                     println!(
-                        "{} ==>{} ===",
+                        "{} ==>  {}  ===",
                         if file_count > 0 { "\n" } else { "" },
                         filename
                     );

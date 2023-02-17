@@ -1,5 +1,4 @@
 use clap::{Arg, Command};
-
 use std::error::Error;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -51,8 +50,8 @@ pub fn get_args() -> MyResult<Config> {
     .to_vec();
 
     Ok(Config {
-        lines: lines,
-        files: files,
+        lines,
+        files,
     })
 }
 

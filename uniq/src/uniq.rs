@@ -1,53 +1,87 @@
+use anyhow::Context;
 use clap::{Arg, Command};
-use std::io::{BufRead, BufReader, self};
-use std::fs::File;
 use std::error::Error;
+use std::fs::File;
+use std::io::{self, BufRead, BufReader, Write};
 
-type MyResult<T> = Result<T, Box<dyn Error>>;
-
-#[derive(Debug)]
 pub struct Config {
     pub in_file: String,
-    pub out_file: Option<String>,
+    pub file_output: Option<String>,
     pub count: bool,
 }
 
-pub fn get_args() -> Result<Config, Box<dyn Error>> {
+type MyResult<T> = anyhow::Result<T, Box<dyn Error>>;
+
+pub fn get_args() -> MyResult<Config> {
     let matches = Command::new("uniqrust")
-        .author("cm39n")
-        .name("uniqrust")
-        .version("v0.0.1")
-        .arg(
-            Arg::new("out_file")
-            .long("uniq")
-            .ignore_case(true)
-            .help("fix me later."),
-            )
+        .author("c631b")
+        .version("0.0.1")
         .arg(
             Arg::new("in_file")
-            .long("in_file")
-            .help("enter files that u want to process"),
-            )
-        .arg(
-            Arg::new("counts")
-            .short('c')
-            .long("counts")
-            .help("Show counts of lines"),
-            )
+                .short('f')
+                .long("in_file")
+                .default_value("-")
+                )
+        .arg(Arg::new("file_output")
+             .long("file_output")
+             )
+        .arg(Arg::new("count")
+             .long("count")
+             .short('c')
+             )
         .get_matches();
-    Ok( Config {
-        in_file: matches.get_one::<String>("in_file").map(Into::into).unwrap(),
-        out_file: matches.get_one::<String>("in_file").map(|v| v.to_string()),
+
+    let in_file = matches
+        .get_one::<String>("in_file")
+        .context("missing your file")?;
+    let file_output = matches
+        .get_one::<String>("file_output")
+        .context("cannot produce your file");
+    // let file_output = matches.get_one::<String>("file_output").map(|v| v.to_string());
+    Ok(Config {
+        in_file: in_file.to_string(),
+        file_output: Some(file_output?.to_string()),
         count: matches.args_present(),
     })
-
 }
 
-pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-                    //Go to bufread file. Read a lot about BufRead and std::io.
-                    //You though about ipmlementing read() with bytes. Seems like a bad  idea on
-                    //practice
-                    //I believe in u.
+pub fn run(config: Config) -> MyResult<()> {
+    let mut file = open(&config.in_file).map_err(|err| format!("{}: {}", config.in_file, err))?;
+
+    let mut some: Box<dyn Write> = match &config.file_output {
+        Some(name_output) => Box::new(File::create(name_output)?),
+        _ => Box::new(io::stdout()),
+    };
+
+    let mut print = |count: u64, file: &str| -> MyResult<()> {
+        if count > 0 {
+            if config.count {
+                write!(some, "{} : {}", count, file)?;
+            } else {
+                write!(some, "{}", file)?;
+            }
+        };
+        Ok(())
+    };
+
+    let mut line = String::new();
+    let mut previous = String::new();
+    let mut count: u64 = 0;
+    loop {
+        let bytes = file.read_line(&mut line)?;
+        if bytes == 0 {
+            break;
+        }
+
+        if line.trim_end() != previous.trim_end() {
+            print(count, &previous)?;
+            previous = line.clone();
+            count = 0;
+        }
+        count += 1;
+        line.clear()
+    }
+    print(count, &previous)?;
     Ok(())
 }
 

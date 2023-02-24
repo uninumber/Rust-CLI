@@ -3,10 +3,9 @@ use clap::{Arg, Command};
 use std::error::Error;
 use std::fs::{File, self};
 use std::io::{self, BufRead, BufReader, Write};
-use std::path::{Path, PathBuf};
 
 pub struct Config {
-    pub in_file: String,
+    pub file_input: String,
     pub file_output: Option<String>,
     pub count: bool,
 }
@@ -18,9 +17,9 @@ pub fn get_args() -> MyResult<Config> {
         .author("c631b")
         .version("0.0.1")
         .arg(
-            Arg::new("in_file")
+            Arg::new("file_input")
                 .short('f')
-                .long("in_file")
+                .long("file_input")
                 .default_value("-")
                 )
         .arg(Arg::new("file_output")
@@ -32,15 +31,13 @@ pub fn get_args() -> MyResult<Config> {
              )
         .get_matches();
 
-    let in_file = matches
-        .get_one::<String>("in_file")
+    let file_input = matches
+        .get_one::<String>("file_input")
         .context("missing your file")?;
-    // let file_output = matches
-    //     .get_one::<String>("file_output")
-    //     .context("cannot produce your file");
-    let file_output = matches.get_one::<String>("file_output").map(|v| v.to_string());
+    let file_output = matches.get_one::<String>("file_output")
+        .map(|v| v.to_string());
     Ok(Config {
-        in_file: in_file.to_string(),
+        file_input: file_input.to_string(),
         file_output,
         // file_output: Some(file_output?.to_string()),
         count: matches.args_present(),
@@ -48,40 +45,55 @@ pub fn get_args() -> MyResult<Config> {
 }
 
 pub fn run(config: Config) -> MyResult<()> {
-    let mut file = open(&config.in_file).map_err(|err| format!("{}: {}", config.in_file, err))?;
+    //just checks if it's able to open file and read information.
+    let mut file = open(&config.file_input)
+        .map_err(|err| format!("{}: {}", config.file_input, err))?;
 
-    let mut some: Box<dyn Write> = match &config.file_output {
+    let mut file_output: Box<dyn Write> = match &config.file_output {
         Some(name_output) => Box::new(File::create(name_output)?),
-        _ => Box::new(io::stdout()),
+        _ => Box::new(io::stdout())
+
     };
 
-    let file_len = fs::read_to_string(&config.in_file)?
+    let file_len = fs::read_to_string(&config.file_input)?
         .lines()
         .count();
 
+    //pragmatic way of displaying info in file
     let mut print = |count: u64, file: &str| -> MyResult<()> {
         if count > 0 {
             if config.count {
-                write!(some, "{} : {}", count, file)?;
+                write!(file_output, "{} : {}", count, file)?;
             } else {
-                write!(some, "{}", file)?;
+                write!(file_output, "{}", file)?;
             }
         };
         Ok(())
     };
 
+    //used to explain what what file is empty
+    let path = for entry in fs::read_dir(".")? {
+        let dir = entry?;
+        if  dir.path().extension().expect("what") == "txt" {
+            println!("Warning: file : {:?} is empty.", dir.path());
+        }
+    };
+
+    //compares possibly instances of strings.
     let mut line = String::new();
     let mut previous = String::new();
     let mut count: u64 = 0;
 
-    for _ in 0..=file_len {
+    //can be also done with simple loop {break;}
+    for _ in 0..file_len {
         let bytes = file.read_line(&mut line)?;
         if bytes.eq(&0) {
-            eprintln!("Warning: file {} is empty", file);
+            eprintln!("{:?}", path)
         }
-        if line != previous {
+        if line.bytes().ne(previous.bytes()){
             print(count, &previous)?;
             previous = line.clone();
+            //declare uniq count for every line
             count = 0;
         }
         count += 1;
@@ -93,6 +105,8 @@ pub fn run(config: Config) -> MyResult<()> {
 pub fn open(file: &str) -> MyResult<Box<dyn BufRead>> {
     match file {
         "-" => Ok(Box::new(BufReader::new(io::stdin()))),
-        _ => Ok(Box::new(BufReader::new(File::open(file)?))),
+        //this part should be ::open, otherwise it will overwrite
+        //content of the file and give error.
+        _ => Ok(Box::new(BufReader::new(File::open(file)?)))
     }
 }

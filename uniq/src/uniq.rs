@@ -60,12 +60,12 @@ pub fn run(config: Config) -> MyResult<()> {
         .count();
 
     //pragmatic way of displaying info in file
-    let mut print = |count: u64, file: &str| -> MyResult<()> {
+    let mut print = |count: u64, text: &str| -> MyResult<()> {
         if count > 0 {
             if config.count {
-                write!(file_output, "{} : {}", count, file)?;
+                write!(file_output, "{} : {}", count, text)?;
             } else {
-                write!(file_output, "{}", file)?;
+                write!(file_output, "{}", text)?;
             }
         };
         Ok(())

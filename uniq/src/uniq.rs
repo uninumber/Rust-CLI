@@ -35,7 +35,7 @@ pub fn get_args() -> MyResult<Config> {
         .get_one::<String>("file_input")
         .context("missing your file")?;
     let file_output = matches.get_one::<String>("file_output")
-        .map(|v| v.to_string());
+        .map(|f| f.to_string());
     Ok(Config {
         file_input: file_input.to_string(),
         file_output,
@@ -51,7 +51,7 @@ pub fn run(config: Config) -> MyResult<()> {
 
     let mut file_output: Box<dyn Write> = match &config.file_output {
         Some(name_output) => Box::new(File::create(name_output)?),
-        _ => Box::new(io::stdout())
+        _ => Box::new(io::stdout().lock())
 
     };
 
@@ -71,33 +71,35 @@ pub fn run(config: Config) -> MyResult<()> {
         Ok(())
     };
 
-    //used to explain what what file is empty
-    let path = for entry in fs::read_dir(".")? {
-        let dir = entry?;
-        if  dir.path().extension().expect("what") == "txt" {
-            println!("Warning: file : {:?} is empty.", dir.path());
-        }
-    };
-
-    //compares possibly instances of strings.
+    //line becomes String "buffer" which takes value till
+    //the end of the line or EOF. read_line()
     let mut line = String::new();
     let mut previous = String::new();
     let mut count: u64 = 0;
 
+    if file_len.eq(&0) {
+        // I thought like "how the fuck would I know that user 
+        // would get error of the file he gonna use. well it was underlying.
+        eprintln!("Your file: {:?} is empty", config.file_input)
+    }
+
     //can be also done with simple loop {break;}
     for _ in 0..file_len {
-        let bytes = file.read_line(&mut line)?;
-        if bytes.eq(&0) {
-            eprintln!("{:?}", path)
-        }
+        file.read_line(&mut line)?;
         if line.bytes().ne(previous.bytes()){
+            //cheese man, so, we should print here the "previous" one 
+            //because the "previous" in this loop means the "last" item that
+            //is identical to the "previouse ones"
+            //and if you try the print just line, you print the next word with count of the
+            //previous which is not similar (equal for bytes) to the "previous"
+            //one, otherwise it will count as similar and just add a new count to this.
             print(count, &previous)?;
             previous = line.clone();
             //declare uniq count for every line
             count = 0;
         }
         count += 1;
-        line.clear()
+        line.clear();
     }
     print(count, &previous)
 }
@@ -110,3 +112,4 @@ pub fn open(file: &str) -> MyResult<Box<dyn BufRead>> {
         _ => Ok(Box::new(BufReader::new(File::open(file)?)))
     }
 }
+

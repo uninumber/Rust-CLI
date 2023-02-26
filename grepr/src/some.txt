@@ -1,4 +1,0 @@
-Vim is great tool for editing files.
-Rust is great programming language for life.
-Hack the system.
-Vim is great tool for editing files.

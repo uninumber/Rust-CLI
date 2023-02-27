@@ -11,7 +11,7 @@ pub struct Config {
     pub files: Vec<String>,
     pub count: bool,
     pub pattern: Regex,
-    // pub recursive: bool,
+    pub recursive: bool,
 }
 
 pub fn getting_args() -> MyResult<Config> {
@@ -44,12 +44,14 @@ pub fn getting_args() -> MyResult<Config> {
         )
         .arg(
             Arg::new("recursive")
+                .action(clap::ArgAction::SetTrue)
                 .short('r')
                 .long("recursive")
                 .help("Recursive search"),
         )
         .arg(
             Arg::new("count")
+                .action(clap::ArgAction::SetTrue)
                 .short('c')
                 .long("count")
                 .help("Count occurrences"),
@@ -73,17 +75,17 @@ pub fn getting_args() -> MyResult<Config> {
         .build()
         .map_err(|_| format!("Invalid pattern \"{}\"", pattern))?;
     Ok(Config {
+        count: arguments.args_present(),
         pattern,
         files,
-        count: arguments.args_present(),
-        // recursive: arguments.args_present(),
+        recursive: arguments.args_present()
     })
 }
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
 pub fn run(config: Config) -> MyResult<()> {
-    let entries = find_files(config.files);
+    let entries = find_files(config.files, config.recursive);
     let file_num = entries.len();
 
     let print = |fname: &str, val: &str| {
@@ -93,7 +95,6 @@ pub fn run(config: Config) -> MyResult<()> {
             print!("{}", val);
         }
     };
-
     for entry in entries {
         match entry {
             Err(e) => eprintln!("{}", e),
@@ -103,7 +104,7 @@ pub fn run(config: Config) -> MyResult<()> {
                     Err(e) => eprintln!("{}", e),
                     Ok(files) => {
                         for line in &files {
-                            print(&filename, line);
+                            print(&filename, line)
                         }
                     }
                 },
@@ -132,7 +133,7 @@ pub fn find_lines<T: BufRead>(
     Ok(matches)
 }
 
-fn find_files(paths: Vec<String>) -> Vec<MyResult<String>> {
+fn find_files(paths: Vec<String>, recursive: bool) -> Vec<MyResult<String>> {
 
     let mut results = vec![];
 
@@ -142,7 +143,7 @@ fn find_files(paths: Vec<String>) -> Vec<MyResult<String>> {
             _ => match fs::metadata(&path) {
                 Ok(metadata) => {
                     if metadata.is_dir() {
-                        // if recursive {
+                        if recursive {
                             for entry in WalkDir::new(path)
                                 .into_iter()
                                 .flatten()
@@ -150,9 +151,9 @@ fn find_files(paths: Vec<String>) -> Vec<MyResult<String>> {
                             {
                                 results.push(Ok(entry.path().display().to_string()));
                             }
-                        // } else {
+                        } else {
                             results.push(Err(From::from(format!("{} is a directory", path))));
-                        // }
+                        }
                     } else if metadata.is_file() {
                         results.push(Ok(path.to_string()));
                     }

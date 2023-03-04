@@ -66,7 +66,7 @@ pub fn getting_args() -> MyResult<Config> {
 
     let files = arguments
         .get_one::<String>("files")
-        .map(|v| vec![v.clone()])
+        .map(|v| vec![v.to_string()])
         .context("error occured during files initialization")?;
     let pattern = arguments
         .get_one::<String>("pattern")

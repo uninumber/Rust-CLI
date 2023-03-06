@@ -1,0 +1,46 @@
+{{template "navbar.tmpl"}}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/main.css">
+<div class="container" style="text-align:center">
+				<!--<img src="css/img/wide.gif" style="border-radius:40%;height:70px; margin: 2vh"> -->
+    <br><br>
+    <br><br>
+    <div> 
+    {{ if .ErrorTitle}}
+    <p> 
+    {{ .ErrorTitle}}: {{.ErrorMessage}}
+    </p>
+    {{end}}
+    <hr style="border:2px solid #202020;margin-bottom:10px; width: 30%; margin:0 auto; border-radius: 10px;">
+    <h3 style="text-align:center;margin-bottom:40px;margin-top:30px;color: #ccc" >Login</h3>
+      <form action="/u/login" method="POST">
+    <!-- email -->
+        <div class="form-group">
+            <label style="font-weight:bold;color: #ccc"for="">Username:</label>
+            <br>
+            <input style="width:25%; margin-right:10px;" type="text" name="username" placeholder="username">
+        </div>
+    <!-- password -->
+        <div class="form-group">
+          <label style="font-weight:bold;color: #ccc" for="">Password:</label>
+          <br>
+          <input type="password" 
+          name="password" placeholder="********" >
+        </div>
+    <!--Checkme button-->
+        <input type="checkbox">
+        <label class="form-check-label d-grid gap-2" style="color: #ccc" for="exampleCheck1">Check me out</label>
+        <br><br>
+        <br><br>
+        <button type="submit" class="example_c">Login</button>
+        <br> <br>					
+      <!--Register -->
+			</form>
+        <a class="example_c" href="/register">Not registered?</a>
+        <br>
+        <br>					
+        <hr style="border:2px solid #202020; margin: 0 auto; width: 30%; margin-top:10px;border-radius: 10px;">
+			</div>
+</div>
+

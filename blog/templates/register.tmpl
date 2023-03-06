@@ -1,0 +1,22 @@
+{{template "navbar.tmpl"}}
+<link rel="stylesheet" href="{% static 'css/fin.css' %}">
+<div class="container">
+				<img src="{% static 'img/wide.gif' %}" style="border-radius:40%;height:150px;margin-top:40px; margin-bottom:50px;">
+				<h3>Registration</h3>
+	<hr style="border:3px solid black;margin-bottom:20px;margin-top:20px;">
+				<form method="POST" action="/register">
+				<h4>Username:</h4>
+				<br>
+				<h4 style="margin-top:20px;">Email:</h4>
+				<br>
+				<br>
+				<h4 style="margin-top:20px;">Password:</h4>
+				<br>
+				<br>
+				<h4 style="margin-top:20px;">Password Confirmation:</h4>
+				<br>
+				<hr style="border:3px solid black;margin-bottom:20px;margin-top:20px;">
+				<input type="submit" class="example_c" value="Register">
+				</form>
+</div>
+

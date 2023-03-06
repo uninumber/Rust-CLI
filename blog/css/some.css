@@ -1,0 +1,407 @@
+body 
+{
+   min-clock-size:100%;
+   min-inline-size:100%;
+   width:50%;
+   height:50%;
+   margin: 0;
+   box-sizing: border-box;
+   place-content: center;
+   background-color: #171717;
+}
+
+
+/* NAV */
+ul {
+	list-style-type: none;
+    overflow: hidden;  
+    background-color: #232323 ;  
+    width: 99.4%;
+    margin:0px auto;
+    left:0;
+    right:0;
+    padding:0;
+} 
+li {
+float:left;
+} 
+li:last-child { 
+border-right: none;
+} 
+li a { 
+display: #fff;
+color: #303030;
+text-align: center;
+padding: 18px 18px;
+font-weight:bold;
+text-decoration:none;
+} 
+li a:hover:not(.active) { 
+background-color: #232323;
+color:#404040;
+} 
+.active {
+background-color: #232323;
+color:#404040;
+font-weight:bold; 
+}
+
+
+/* underline */
+nav.stroke  ul li a,
+nav.fill  ul li a {
+  position: relative;
+}
+nav.stroke  ul li a:after,
+nav.fill  ul li a:after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 0%;
+  content: '.';
+  color: #404040;
+  background-color: #ccc;
+  height: 2px;
+  border-radius:10px;
+}
+nav.stroke  ul li a:hover:after {
+  width: 90%;
+  }
+
+nav  ul {
+  list-style: none;
+  text-align: center;
+}
+nav  ul li {
+	display:inline-block;
+}
+/* contact */
+nav  ul li a {
+  display: block;
+  padding: 10px;
+  color: #404040;
+  text-decoration:none;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 5 3px;
+}
+nav  ul li a.some {
+  color: #fca500;
+}
+nav  ul li a.some:hover {
+  color: #fca500;
+}
+nav  ul li a:hover {
+  color: #fca500;
+}
+nav  ul li a,
+nav  ul li a:after,
+nav  ul li a:before {
+  transition: all .4s;
+}
+
+/* this is main part of nav */
+nav {
+  width: 100%;
+  margin: 0 auto;
+  background: #232323;
+  color: #aaa;
+  border: 3px solid #111111;
+  /* border-radius:10px; */
+  padding: 10px 0;
+  box-shadow: 1px 3px 5px #000;
+}
+
+
+ .search {
+   font-weight: bold;
+	float:right;
+   height:10px;
+   margin:  1px 5px 20px 20px;
+  }
+
+/* layers */
+.bg3 {
+	background-color:#fff;
+	height:90vh;
+	margin: 0px;
+	padding: 0px;
+	align-items:center;
+	text-align:center;
+	margin: 10px 300px 10px;
+}
+
+
+.section2 {
+	height:160vh;
+    box-sizing:border-box;
+	text-align:center;
+}
+.section4 {
+	height:100vh;
+    box-sizing:border-box;
+	text-align:center;
+}
+.section3 {
+	heigh150vh;
+	box-sizing:border-box;
+}
+
+
+.spacer {
+  height: 55vh;
+  background-color: #000;
+}
+
+.container {
+	text-align:center;
+	justify-content:center;
+	height:20vh;
+}
+
+
+/* SUPPORT ANIMATION */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.waviy {
+  position: relative;
+}
+.waviy span {
+  position: relative;
+  display: inline-block;
+  font-size: 40px;
+  color: #000;
+  text-transform: uppercase;
+  animation: flip 2s infinite;
+  animation-delay: calc(0.1s * var(--i))
+}
+@keyframes flip {
+  0%,90% {
+    transform: rotateY(360deg) 
+  }
+}
+/*INPUT STYLE */
+
+input[type=text] {
+  width: 20%;
+  padding: 12px 20px;
+  font-weight: bold;
+  margin: 8px ;
+  box-sizing: border-box;
+  border: 3px solid #ccc;
+  border-radius:4px;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+}
+input[type=text]:focus {
+  border: 3px solid #ccc;
+  font-weight: bold;
+}
+
+input[type=text]:hover {
+	border-color: #202020;
+  font-weight: bold;
+}
+
+
+input[type=search] {
+  background-color: #232323;
+  color: #aaa;
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px ;
+  margin-right:50px;
+  box-sizing: border-box;
+  border: 2px solid #707070;
+  border-radius:4px;
+  -webkit-transition: 0.5s;
+  transition: 0.2s;
+  outline: none;
+}
+input[type=search]:focus {
+  font-size: 15px;
+  background-color: #232323;
+  border-color: #fca500;
+  font-weight: bold;
+}
+
+input[type=search]:hover {
+  border-color: #fca500;
+}
+
+input[type=email] {
+  font-weight: bold;
+  width: 20%;
+  padding: 12px 20px;
+  margin: 8px ;
+  box-sizing: border-box;
+  border: 3px solid #ccc;
+  border-radius:4px;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+}
+input[type=email]:focus {
+  border: 3px solid #202020;
+  font-weight: bold;
+}
+
+input[type=email]:hover {
+	border-color: #202020;
+  font-weight: bold;
+}
+
+
+input[type=password] {
+  width: 20%;
+  font-weight: bold;
+  padding: 12px 20px;
+  margin: 8px ;
+  box-sizing: border-box;
+  border: 3px solid #ccc;
+  border-radius:4px;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+}
+input[type=password]:focus {
+  border: 3px solid #202020;
+  font-weight: bold;
+}
+
+input[type=password]:hover {
+	border-color: #202020;
+  font-weight: bold;
+}
+
+input[type=email]::placeholder
+{
+	text-align:center;
+  font-weight: bold;
+}
+
+input[type=password]::placeholder
+{
+  font-weight: bold;
+	text-align:center;
+}
+
+input[type=text]::placeholder
+{
+  font-weight: bold;
+	text-align:center;
+}
+/* <a>style for purhase */
+.example_d {
+color: black;
+font-weight:bold;
+background: white;
+font-size:60%;
+
+text-transform: uppercase;
+padding: 10px;
+border: 3px solid black;
+border-radius: 6px;
+display: inline-block;
+text-decoration:none;
+transition: all 0.3s ease 0s;
+}
+.example_d:hover {
+color: black;
+border-radius: 50px;
+border-color: black;
+transition: all 0.3s ease 0s;
+
+}
+
+
+/* <a>style for rest */
+.example_c {
+color: #505050;
+font-weight:bold;
+background: #ccc;
+font-size:100%;
+text-transform: uppercase;
+padding: 10px;
+border: 3px solid #202020;
+border-radius: 6px;
+display: inline-block;
+text-decoration:none;
+transition: all 0.3s ease 0s;
+}
+.example_c:hover {
+color: #202020;
+background:lightgreen;
+border-radius: 50px;
+border-color: #202020;
+transition: all 0.3s ease 0s;
+
+}
+.example_n {
+color: #000;
+font-weight:bold;
+background: #ccc;
+font-size:100%;
+text-transform: uppercase;
+padding: 5px;
+border: 3px solid #101010;
+border-radius: 6px;
+margin-right: 10px;
+text-decoration:none;
+transition: all 0.3s ease 0s;
+}
+.example_n:hover {
+color: #fca500;
+background-color: #171717;
+border-color: #101010;
+transition: all 0.2s ease 0s;
+
+}
+
+/* Quality, Design, Speed */
+.mark
+{
+	margin-top:30px;
+	margin-bottom:30px;
+	border: 5px solid black;
+	display:inline-block;
+	
+box-shadow: 8px 7px 2px  #242425;
+	
+	transition: all 0.3s ease 0s;
+}
+
+.mark:hover {
+color: #202020;
+box-shadow: 1px 1px 2px #242425;
+border: 5px solid black;
+border-radius:10px;
+border-color: #202020;
+transition: all 0.3s ease 0s;
+padding:5px;
+}	
+
+
+.text2 {
+	display:inline-block;
+	font-weight:bold;
+	margin-left:5px;
+	margin-right:5px;
+	margin-bottom:5px;
+
+
+
+
+.box-element {
+	box-shadow: hsl(0, 0%, 80%) 0 0 16px;
+	background-color: #fff;
+	padding:10px;
+}
+

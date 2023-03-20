@@ -21,6 +21,7 @@ pub fn get_args() -> MyResult<Config> {
                 .short('f')
                 .long("file_input")
                 .default_value("-")
+                .num_args(1..)
                 )
         .arg(Arg::new("file_output")
              .long("file_output")
@@ -87,7 +88,7 @@ pub fn run(config: Config) -> MyResult<()> {
     for _ in 0..file_len {
         file.read_line(&mut line)?;
         if line.bytes().ne(previous.bytes()){
-            //cheese man, so, we should print here the "previous" one 
+            //cheeeese man, so we should print here the "previous" one 
             //because the "previous" in this loop means the "last" item that
             //is identical to the "previouse ones"
             //and if you try the print just line, you print the next word with count of the

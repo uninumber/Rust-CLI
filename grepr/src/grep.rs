@@ -6,12 +6,14 @@ use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader};
 use std::mem;
 use walkdir::WalkDir;
+
 #[derive(Debug, Clone)]
 pub struct Config {
     pub files: Vec<String>,
     pub count: bool,
     pub pattern: Regex,
     pub recursive: bool,
+    pub insensitive: bool
 }
 
 pub fn getting_args() -> MyResult<Config> {
@@ -25,16 +27,17 @@ pub fn getting_args() -> MyResult<Config> {
         .term_width(100)
         .arg(
             Arg::new("pattern")
-                .value_name("PATTERN")
-                .help("Search pattern")
+                .value_name("pattern")
+                .help("Searches files for given pattern")
                 .required(true),
         )
         .arg(
             Arg::new("files")
-                .value_name("FILE")
-                .help("Input file(s)")
+                // .short('f')
+                // .long("file")
+                .help("Provide files, that you want to be proccesed")
                 .num_args(1..)
-                .default_value("-"),
+                .default_value("-")
         )
         .arg(
             Arg::new("insensitive")
@@ -74,11 +77,18 @@ pub fn getting_args() -> MyResult<Config> {
     let pattern = RegexBuilder::new(&pattern)
         .build()
         .map_err(|_| format!("Invalid pattern \"{}\"", pattern))?;
+    let recursive = arguments
+        .get_one::<bool>("recursive").is_some();
+    let count = arguments
+        .get_one::<bool>("count").is_some();
+    let insensitive = arguments.get_one::<String>("insensitive").is_some();
+
     Ok(Config {
-        count: arguments.args_present(),
+        insensitive,
+        count,
         pattern,
         files,
-        recursive: arguments.args_present()
+        recursive
     })
 }
 
@@ -95,12 +105,13 @@ pub fn run(config: Config) -> MyResult<()> {
             print!("{}", val);
         }
     };
+
     for entry in entries {
         match entry {
             Err(e) => eprintln!("{}", e),
             Ok(filename) => match open(&filename) {
                 Err(e) => eprintln!("{}: {}", filename, e),
-                Ok(file) => match find_lines(file, &config.pattern) {
+                Ok(file) => match find_lines(file, &config.pattern, config.insensitive) {
                     Err(e) => eprintln!("{}", e),
                     Ok(files) => {
                         for line in &files {
@@ -114,17 +125,22 @@ pub fn run(config: Config) -> MyResult<()> {
     Ok(())
 }
 
-pub fn find_lines<T: BufRead>(
-    mut file: T,
-    pattern: &Regex) -> MyResult<Vec<String>> {
+pub fn find_lines<T: BufRead>(mut file: T, pattern: &Regex, insensitive: bool) -> MyResult<Vec<String>> {
     let mut matches = vec![];
     let mut line = String::new();
 
     loop {
         let bytes = file.read_line(&mut line)?;
-        if line.contains(&pattern.to_string()) {
-            matches.push(mem::take(&mut line));
+        if insensitive {
+            if line.to_lowercase().contains(&pattern.to_string().to_lowercase()) {
+                matches.push(mem::take(&mut line));
+            }
+        } else {
+            if line.contains(&pattern.to_string()) {
+                matches.push(mem::take(&mut line));
+            }
         }
+
         line.clear();
         if bytes.eq(&0) {
             break;
@@ -134,12 +150,11 @@ pub fn find_lines<T: BufRead>(
 }
 
 fn find_files(paths: Vec<String>, recursive: bool) -> Vec<MyResult<String>> {
-
     let mut results = vec![];
 
     for path in &paths {
         match path.as_str() {
-            "-" => eprintln!("Provide some file"),
+            "-" => eprintln!("Provide file(-s)"),
             _ => match fs::metadata(&path) {
                 Ok(metadata) => {
                     if metadata.is_dir() {
@@ -168,6 +183,6 @@ fn find_files(paths: Vec<String>, recursive: bool) -> Vec<MyResult<String>> {
 pub fn open(file: &str) -> MyResult<Box<dyn BufRead>> {
     match file {
         "-" => Ok(Box::new(BufReader::new(io::stdin()))),
-        _ => Ok(Box::new(BufReader::new(File::open(file)?))),
+        _ => Ok(Box::new(BufReader::new(File::open(file)?)))
     }
 }

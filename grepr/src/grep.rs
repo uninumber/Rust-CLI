@@ -11,9 +11,10 @@ use walkdir::WalkDir;
 pub struct Config {
     pub files: Vec<String>,
     pub count: bool,
-    pub pattern: Regex,
     pub recursive: bool,
-    pub insensitive: bool
+    pub insensitive: bool,
+    pub invert: bool,
+    pub pattern: Regex
 }
 
 pub fn getting_args() -> MyResult<Config> {
@@ -81,14 +82,17 @@ pub fn getting_args() -> MyResult<Config> {
         .get_one::<bool>("recursive").is_some();
     let count = arguments
         .get_one::<bool>("count").is_some();
-    let insensitive = arguments.get_one::<String>("insensitive").is_some();
+    let insensitive = arguments.get_one::<String>("insensitive").is_none();
+    let invert = arguments
+        .get_one::<String>("invert").is_some();
 
     Ok(Config {
         insensitive,
         count,
         pattern,
         files,
-        recursive
+        recursive,
+        invert
     })
 }
 
@@ -111,7 +115,7 @@ pub fn run(config: Config) -> MyResult<()> {
             Err(e) => eprintln!("{}", e),
             Ok(filename) => match open(&filename) {
                 Err(e) => eprintln!("{}: {}", filename, e),
-                Ok(file) => match find_lines(file, &config.pattern, config.insensitive) {
+                Ok(file) => match find_lines(file, &config.pattern, config.insensitive, config.invert) {
                     Err(e) => eprintln!("{}", e),
                     Ok(files) => {
                         for line in &files {
@@ -125,20 +129,20 @@ pub fn run(config: Config) -> MyResult<()> {
     Ok(())
 }
 
-pub fn find_lines<T: BufRead>(mut file: T, pattern: &Regex, insensitive: bool) -> MyResult<Vec<String>> {
+pub fn find_lines<T: BufRead>(mut file: T, pattern: &Regex, _insensitive: bool, invert: bool) -> MyResult<Vec<String>> {
     let mut matches = vec![];
     let mut line = String::new();
 
     loop {
         let bytes = file.read_line(&mut line)?;
-        if insensitive {
-            if line.to_lowercase().contains(&pattern.to_string().to_lowercase()) {
+        // if insensitive {
+        //     if line.to_lowercase().contains(&pattern.to_string().to_lowercase()) {
+        //         matches.push(mem::take(&mut line));
+        //     }
+        // } else {
+            if line.contains(&pattern.to_string()) ^ invert {
                 matches.push(mem::take(&mut line));
-            }
-        } else {
-            if line.contains(&pattern.to_string()) {
-                matches.push(mem::take(&mut line));
-            }
+            // }
         }
 
         line.clear();

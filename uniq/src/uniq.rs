@@ -95,7 +95,7 @@ pub fn run(config: Config) -> MyResult<()> {
             //previous which is not similar (equal for bytes) to the "previous"
             //one, otherwise it will count as similar and just add a new count to this.
             print(count, &previous)?;
-            //ToString also implements Copy trait, so can be "efficienty" used 
+            //ToString also implements Copy trait, so can be "efficiently" used 
             //instead of clone.
             previous = line.to_string();
             //declare uniq count for every line

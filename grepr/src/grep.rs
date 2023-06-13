@@ -34,8 +34,6 @@ pub fn getting_args() -> MyResult<Config> {
         )
         .arg(
             Arg::new("files")
-                // .short('f')
-                // .long("file")
                 .help("Provide files, that you want to be proccesed")
                 .num_args(1..)
                 .default_value("-")
@@ -72,17 +70,23 @@ pub fn getting_args() -> MyResult<Config> {
         .get_one::<String>("files")
         .map(|v| vec![v.to_string()])
         .context("error occured during files initialization")?;
+
     let pattern = arguments
         .get_one::<String>("pattern")
         .context("error ocurred during pattern initialization")?;
+
     let pattern = RegexBuilder::new(&pattern)
         .build()
         .map_err(|_| format!("Invalid pattern \"{}\"", pattern))?;
+
     let recursive = arguments
         .get_one::<bool>("recursive").is_some();
+
     let count = arguments
         .get_one::<bool>("count").is_some();
+
     let insensitive = arguments.get_one::<String>("insensitive").is_none();
+
     let invert = arguments
         .get_one::<String>("invert").is_some();
 
@@ -129,20 +133,20 @@ pub fn run(config: Config) -> MyResult<()> {
     Ok(())
 }
 
-pub fn find_lines<T: BufRead>(mut file: T, pattern: &Regex, _insensitive: bool, invert: bool) -> MyResult<Vec<String>> {
+pub fn find_lines<T: BufRead>(mut file: T, pattern: &Regex, insensitive: bool, invert: bool) -> MyResult<Vec<String>> {
     let mut matches = vec![];
     let mut line = String::new();
 
     loop {
         let bytes = file.read_line(&mut line)?;
-        // if insensitive {
-        //     if line.to_lowercase().contains(&pattern.to_string().to_lowercase()) {
-        //         matches.push(mem::take(&mut line));
-        //     }
-        // } else {
+        if insensitive {
+            if line.to_lowercase().contains(&pattern.to_string().to_lowercase()) {
+                matches.push(mem::take(&mut line));
+            }
+        } else {
             if line.contains(&pattern.to_string()) ^ invert {
                 matches.push(mem::take(&mut line));
-            // }
+            }
         }
 
         line.clear();

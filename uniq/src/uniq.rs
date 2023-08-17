@@ -79,8 +79,6 @@ pub fn run(config: Config) -> MyResult<()> {
     let mut count: u64 = 0;
 
     if file_len.eq(&0) {
-        // I thought like "how the fuck would I know that user 
-        // would get error of the file he gonna use. well it was underlying.
         eprintln!("Your file: {:?} is empty", config.file_input)
     }
 
@@ -88,12 +86,6 @@ pub fn run(config: Config) -> MyResult<()> {
     for _ in 0..file_len {
         file.read_line(&mut line)?;
         if line.bytes().ne(previous.bytes()){
-            //cheeeese man, so we should print here the "previous" one 
-            //because the "previous" in this loop means the "last" item that
-            //is identical to the "previouse ones"
-            //and if you try the print just line, you print the next word with count of the
-            //previous which is not similar (equal for bytes) to the "previous"
-            //one, otherwise it will count as similar and just add a new count to this.
             print(count, &previous)?;
             //ToString also implements Copy trait, so can be "efficiently" used 
             //instead of clone.
